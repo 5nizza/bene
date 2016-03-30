@@ -18,6 +18,7 @@ def main(tool_cmd:str, tool_params:str,
          hardware):
     os.makedirs(logs_dir, exist_ok=True)
     for input_file in benchmarks_list:
+        print('starting a job for ', input_file)
         input_basename = os.path.basename(input_file)
         execute_shell('{spawn_job} '
                       'python3 {REU} '
