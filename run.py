@@ -16,7 +16,7 @@ def main(tool_cmd:str, tool_params:str,
          time_limit_sec,
          memory_limit_mb,
          hardware):
-    os.makedirs(exist_ok=True)
+    os.makedirs(logs_dir, exist_ok=True)
     for input_file in benchmarks_list:
         input_basename = os.path.basename(input_file)
         execute_shell('{spawn_job} '
@@ -61,9 +61,11 @@ if __name__ == "__main__":
     parser.add_argument('--db', required=True, help='database credentials (TODO)')
     parser.add_argument('--exp_name', required=True, help='name your experiment')
     parser.add_argument('--commit', required=True, help='version of the tool')
-    parser.add_argument('--time_limit_sec', required=False, default=10, type=int)
-    parser.add_argument('--memory_limit_mb', required=False, default=10000, type=int)
+    parser.add_argument('--time_limit_sec', required=False, default=10, type=int, help='(default: %(default)i)')
+    parser.add_argument('--memory_limit_mb', required=False, default=10000, type=int, help='(default: %(default)i)')
     parser.add_argument('--hardware', required=True, help='hardware on which you run')
+    # TODO: default logs folder created from exp_name + salt?
+    # TODO: default commit?
 
     args = parser.parse_args()
 
