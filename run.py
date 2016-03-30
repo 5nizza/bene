@@ -26,7 +26,7 @@ def main(tool_cmd:str, tool_params:str,
                       '--exec_log {exec_log} --tool_log {tool_log} '
                       '--db {db} '
                       '--exp_name {exp_name} --commit {commit} '
-                      '--time_limit_sec {time_limit_sec} --mem_limit_mb {mem_limit_mb} '
+                      '--time_limit_sec {time_limit_sec} --memory_limit_mb {memory_limit_mb} '
                       '--hardware {hardware}'
                       .format(spawn_job=SPAWN_JOB_CMD,
                               REU='reu.py',
