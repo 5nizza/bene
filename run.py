@@ -22,13 +22,13 @@ def main(tool_cmd:str, tool_params:str,
         input_basename = os.path.basename(input_file)
         rc, out, err = execute_shell('{spawn_job} '
                                      'python3 {REU} '
-                                     '--tool {tool_cmd} --tool_params {tool_params} '
-                                     '--input_file {input_file} --output_file {output_file} '
-                                     '--exec_log {exec_log} --tool_log {tool_log} '
-                                     '--db {db} '
-                                     '--exp_name {exp_name} --commit {commit} '
+                                     '--tool "{tool_cmd}" --tool_params "{tool_params}" '
+                                     '--input_file "{input_file}" --output_file "{output_file}" '
+                                     '--exec_log "{exec_log}" --tool_log "{tool_log}" '
+                                     '--db "{db}" '
+                                     '--exp_name "{exp_name}" --commit "{commit}" '
                                      '--time_limit_sec {time_limit_sec} --memory_limit_mb {memory_limit_mb} '
-                                     '--hardware {hardware}'
+                                     '--hardware "{hardware}"'
                                      .format(spawn_job=SPAWN_JOB_CMD,
                                              REU='reu.py',
                                              tool_cmd=tool_cmd,
@@ -47,7 +47,9 @@ def main(tool_cmd:str, tool_params:str,
         if rc != 0:
             print('FAILED: rc = ', rc, 'stdout = ', out, 'stderr = ', err)
             return 1
-        return 0
+
+        # end of for
+    return 0
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Hi, I am Bene, I run your tool, extract data, and fill DB:\n'
