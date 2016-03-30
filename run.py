@@ -20,6 +20,7 @@ def main(tool_cmd:str, tool_params:str,
     for input_file in benchmarks_list:
         print('starting a job for ', input_file)
         input_basename = os.path.basename(input_file)
+        # TODO: get absolute paths
         execute_shell('{spawn_job} '
                       'python3 {REU} '
                       '--tool {tool_cmd} --tool_params {tool_params} '
@@ -70,7 +71,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    benchmarks = [b for b in args.benchmarks_list.readlines()
+    benchmarks = [b for b in args.benchmarks_list.read().splitlines()  # this avoids newlines (vs. readlines())
                   if b.strip()]
 
     print(args)
