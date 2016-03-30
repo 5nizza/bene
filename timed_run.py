@@ -58,7 +58,3 @@ def main(time_limit_sec:int,
 
     return stats, tool_rc
 
-
-if __name__ == "__main__":
-    import sys
-    print(main(*sys.argv[1:]))
