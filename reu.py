@@ -36,7 +36,9 @@ def set_exc_hook(logger:Logger):
 
 
 if __name__ == "__main__":
-    # TODO: bad design for tool params? (provide template)
+    # TODO: test with srun, create DB uploader
+
+    # TODO: bad design for tool params? (provide template?)
 
     parser = argparse.ArgumentParser(description='REU: Run the tool - Extract the data - Upload to the DB.\n'
                                                  "Note on the DB: if a table named 'exp_name' already exists,\n"

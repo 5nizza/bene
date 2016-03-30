@@ -3,14 +3,13 @@ import argparse
 
 from utils import execute_shell, readfile
 
-REU_CMD = ''   # Run the tool - Extract the data - Upload to the DB
 SPAWN_JOB_CMD = 'srun'
 
 
 def main(tool_cmd:str, tool_params:str, benchmarks_list:list, logs_dir:str, db:str):
     for input_file in benchmarks_list:
         execute_shell('{spawn_job} {REU} {tool_cmd} {tool_params} {input_file} {logs_dir} {db}'
-                      .format(REU=REU_CMD,
+                      .format(REU='python3 reu.py',
                               spawn_job=SPAWN_JOB_CMD,
                               tool_cmd=tool_cmd,
                               tool_params=tool_params,

@@ -5,10 +5,11 @@ from logging import Logger
 from tool_run_params import ToolRunParams
 from run_stats import RunStats
 from utils import get_tmp_file_name, execute_shell, readfile
+from config import RUN_SOLVER_EXEC
 
 
 def get_float(param_name, text):
-    numbers = re.findall(param_name + '=([0-9]+[\.]?[0-9]*)',
+    numbers = re.findall(param_name + '=([0-9]+\.?[0-9]*)',
                          text)
     assert len(numbers) == 1, numbers
     return float(numbers[0])
@@ -30,8 +31,6 @@ def get_tool_rc(exec_log_str) -> int:
 def main(time_limit_sec:int,
          tool_run:ToolRunParams,
          logger:Logger) -> (RunStats, int):
-
-    from config import RUN_SOLVER_EXEC
 
     stats_file_name = get_tmp_file_name()
     exec_log_file = get_tmp_file_name()

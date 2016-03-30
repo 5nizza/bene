@@ -37,7 +37,7 @@ def extract_data(run_stats:RunStats,
                  tool_rc,
                  logger:Logger) -> RunRecord:
     """
-    REU.py calls this function filling the parameters.
+    reu.py calls this function filling the parameters.
     This function is tool dependent, thus You need to implement it.
     """
     is_realizable = tool_rc == REAL_RC
