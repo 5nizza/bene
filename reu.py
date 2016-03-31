@@ -8,12 +8,12 @@ import datetime
 import timed_run
 from ansistrm import setup_logging
 from data_extractor import extract_data
-from data_record import ExperimentRecord
-from data_uploader import upload_record
+from data_record import Experiment
+from data_uploader import upload_run
 from tool_run_params import ToolRunParams
 
 
-def main(exp_record:ExperimentRecord, tool_launch_data:ToolRunParams, db,
+def main(exp_record:Experiment, tool_launch_data:ToolRunParams, db,
          tag, note,
          logger:Logger):
     run_stats, tool_rc = timed_run.main(exp_record.time_limit_sec, tool_launch_data, logger)
@@ -21,7 +21,7 @@ def main(exp_record:ExperimentRecord, tool_launch_data:ToolRunParams, db,
     run_record.exp = exp_record
     run_record.note = note
     run_record.tag = tag
-    upload_record(db, run_record, logger)
+    upload_run(db, run_record, logger)
 
 
 def set_exc_hook(logger:Logger):
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='REU: Run the tool - Extract the data - Upload to the DB.\n'
                                                  "Note on the DB: if a table named 'exp_name' already exists,\n"
-                                                 "then I create table 'exp_name_i' for lowest natural number i\n"
+                                                 "then I create table 'exp_name_i' with lowest natural number i\n"
                                                  "such that 'exp_name_i' is not in the DB.",
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--tool',        required=True, help='your tool executable')
@@ -65,16 +65,16 @@ if __name__ == "__main__":
 
     set_exc_hook(logger)
 
-    exp = ExperimentRecord(args.exp_name,
-                           datetime.datetime.now(),
-                           args.tool,
-                           args.tool_params,
-                           args.commit,
-                           args.time_limit_sec,
-                           args.memory_limit_mb,
-                           args.hardware,
-                           None,
-                           None)
+    exp = Experiment(args.exp_name,
+                     datetime.datetime.now(),
+                     args.tool,
+                     args.tool_params,
+                     args.commit,
+                     args.time_limit_sec,
+                     args.memory_limit_mb,
+                     args.hardware,
+                     None,
+                     None)
 
     tool_launch_data = ToolRunParams(args.tool, args.tool_params, args.input_file, args.output_file, args.tool_log)
 

@@ -32,6 +32,8 @@ def main(time_limit_sec:int,
          tool_run:ToolRunParams,
          logger:Logger) -> (RunStats, int):
 
+    logger.info('timed_run.main')
+
     stats_file_name = get_tmp_file_name()
     exec_log_file = get_tmp_file_name()
 

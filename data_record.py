@@ -1,7 +1,7 @@
 import datetime
 
 
-class ExperimentRecord:
+class Experiment:
     def __init__(self,
                  name:str,
                  date:datetime.datetime,
@@ -25,15 +25,15 @@ class ExperimentRecord:
         self.tag = tag
 
     def __str__(self):
-        return '<ExperimentRecord>' + '\n' \
+        return '<Experiment>' + '\n' \
                + '\n'.join(list(map(lambda vv: vv[0] + ': ' + str(vv[1]),
                                     self.__dict__.items()))) \
-               + '\n</ExperimentRecord>'
+               + '\n</Experiment>'
 
 
-class RunRecord:
+class Run:
     def __init__(self,
-                 exp:ExperimentRecord or None,
+                 exp:Experiment or None,
                  input_file:str,
                  total_time_sec:int,
                  time_win_region_sec:int or None,
@@ -59,9 +59,9 @@ class RunRecord:
         self.tag = tag
 
     def __str__(self):
-        return '<RunRecord>' + '\n'\
+        return '<Run>' + '\n'\
                + '\n'.join(list(map(lambda vv: vv[0] + ': ' + str(vv[1]),
                                     self.__dict__.items())))\
-               + '\n</RunRecord>'
+               + '\n</Run>'
 
 

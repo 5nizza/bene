@@ -7,7 +7,11 @@ import stat
 CONFIG_PY_NAME = 'config.py'
 
 CONFIG_PY_TEXT = """
-RUN_SOLVER_EXEC = "/home/ayrat/projects/runsolver/src/runsolver"
+RUN_SOLVER_EXEC = '/home/ayrat/projects/runsolver/src/runsolver'
+DB_HOST = 'host'
+DB_USER = 'user'
+DB_PASSWD = 'user password'
+DB_DBNAME = 'database name'
 """
 
 
