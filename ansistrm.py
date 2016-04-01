@@ -29,8 +29,6 @@ def setup_logging(verbose_level=0, filename=None):
 
     root.setLevel(level)
 
-    return logging.getLogger(filename or __name__)
-
 ############################################################################
 
 #
