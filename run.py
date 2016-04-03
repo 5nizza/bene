@@ -1,31 +1,45 @@
 #!/usr/bin/python3
 import argparse
 import os
+import datetime
+import logging
 
+from ansistrm import setup_logging
+from data_uploader import create_table, table_exists
 from utils import execute_shell
 
 SPAWN_JOB_CMD = 'srun'
 
 
+# TODO: handle timeout
+
+
 def main(tool_cmd:str, tool_params:str,
          benchmarks_list:list,
          logs_dir:str,
-         db:str,
          exp_name,
          commit,
-         time_limit_sec,
-         memory_limit_mb,
+         time_limit_sec, memory_limit_mb,
          hardware):
+
+    if table_exists(exp_name):
+        choice = input("The table '{exp_name}' already exists. Stop/Continue? [s/c]".format(exp_name=exp_name))
+        assert choice in 'sc', choice
+        if choice == 's':
+            return 0
+    else:
+        create_table(exp_name)
+
     os.makedirs(logs_dir, exist_ok=True)
+
     for input_file in benchmarks_list:
-        print('starting a job for ', input_file)
+        logging.info('starting a job for ' + input_file)
         input_basename = os.path.basename(input_file)
-        rc, out, err = execute_shell('{spawn_job} '
-                                     'python3 {REU} '
+        # rc, out, err = execute_shell('{spawn_job} '   # TODO: debug only
+        rc, out, err = execute_shell('python3 {REU} '
                                      '--tool "{tool_cmd}" --tool_params "{tool_params}" '
                                      '--input_file "{input_file}" --output_file "{output_file}" '
                                      '--exec_log "{exec_log}" --tool_log "{tool_log}" '
-                                     '--db "{db}" '
                                      '--exp_name "{exp_name}" --commit "{commit}" '
                                      '--time_limit_sec {time_limit_sec} --memory_limit_mb {memory_limit_mb} '
                                      '--hardware "{hardware}"'
@@ -37,7 +51,6 @@ def main(tool_cmd:str, tool_params:str,
                                              output_file=logs_dir + '/' + input_basename + '.model',
                                              exec_log=logs_dir + '/' + input_basename + '.exec.log',
                                              tool_log=logs_dir + '/' + input_basename + '.tool.log',
-                                             db=db,
                                              exp_name=exp_name,
                                              commit=commit,
                                              time_limit_sec=time_limit_sec,
@@ -45,7 +58,8 @@ def main(tool_cmd:str, tool_params:str,
                                              hardware=hardware
                                              ))
         if rc != 0:
-            print('FAILED: rc = ', rc, 'stdout = ', out, 'stderr = ', err)
+            logging.fatal('run.py:main: FAILED (see below)')
+            logging.info('rc = ' + str(rc) + ', stdout = ' + out + ', stderr = ' + err)
             return 1
 
         # end of for
@@ -56,7 +70,7 @@ if __name__ == "__main__":
                                                  '  for input_file in <benchmarks_list>:\n'
                                                  '    spawn_job timed_run <tool> <tool_params> input_file -o output_file\n'
                                                  '    data = <extract_data>(<logs_dir>, input_file)\n'
-                                                 '    fill(data, <db>).\n'
+                                                 '    fill_db(data).\n'
                                                  'I will use <logs_dir> for output files and logs.',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--tool', required=True, help='your tool executable')
@@ -65,26 +79,27 @@ if __name__ == "__main__":
                         help='file containing a list of benchmarks (one filepath per line)')
     parser.add_argument('--logs_dir', required=True, type=str,
                         help='directory for log files (will be created if does not exists)')
-    parser.add_argument('--db', required=True, help='database credentials (TODO)')
-    parser.add_argument('--exp_name', required=True, help='name your experiment')
+    parser.add_argument('--exp_name', required=False, help="name your experiment (if not set, will be 'exp_<datetime>'")
     parser.add_argument('--commit', required=True, help='version of the tool')
     parser.add_argument('--time_limit_sec', required=False, default=10, type=int, help='(default: %(default)i)')
     parser.add_argument('--memory_limit_mb', required=False, default=10000, type=int, help='(default: %(default)i)')
     parser.add_argument('--hardware', required=True, help='hardware on which you run')
     # TODO: default logs folder created from exp_name + salt?
-    # TODO: default commit?
+    # TODO: default commit/hardware
+    # TODO: None for time/memory limits
 
     args = parser.parse_args()
 
     benchmarks = [b for b in args.benchmarks_list.read().splitlines()  # this avoids newlines (vs. readlines())
                   if b.strip()]
 
-    print(args)
+    setup_logging()
+    logging.info(args)
+
     exit(main(args.tool, args.tool_params,
               benchmarks,
               os.path.abspath(args.logs_dir),
-              args.db,
-              args.exp_name,
+              args.exp_name or 'exp {datetime}'.format(datetime=str(datetime.datetime.now())),
               args.commit,
               args.time_limit_sec, args.memory_limit_mb,
               args.hardware))

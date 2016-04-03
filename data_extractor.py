@@ -1,17 +1,12 @@
-import os
 import re
-from logging import Logger
+import logging
 
-from data_record import Run
-from run_stats import RunStats
-from tool_run_params import ToolRunParams
+from consts import REAL_RC, UNREAL_RC, TIMEOUT_RC
+from structs import RunResult
 from utils import readfile
 
 
-REAL_RC = 10
-
-
-def parse_demiurge_logs(tool_log) -> (float, float):
+def parse_demiurge_logs(tool_log) -> (float, float, int):
     """
     :returns: win_region_time_sec, circuit_extr_sec
     """
@@ -32,29 +27,27 @@ def parse_demiurge_logs(tool_log) -> (float, float):
            int(circuit_size[0])
 
 
-def extract_data(run_stats:RunStats,
-                 tool_launch_data:ToolRunParams,
-                 tool_rc,
-                 logger:Logger) -> Run:
+def extract_data(tool_output_file,
+                 tool_log_file,
+                 tool_rc) -> RunResult:
     """
     reu.py calls this function filling the parameters.
     This function is tool dependent, thus You need to implement it.
     """
-    logger.info('data_extractor.extract_data')
+    logging.info('data_extractor.extract_data')
 
-    is_realizable = tool_rc == REAL_RC
-    win_region_cpu, circuit_extr_cpu, circuit_size = parse_demiurge_logs(readfile(tool_launch_data.log_file)) \
+    assert tool_rc in (REAL_RC, UNREAL_RC, TIMEOUT_RC), tool_rc
+    is_realizable = {REAL_RC:'REAL',
+                     UNREAL_RC:'UNREAL',
+                     TIMEOUT_RC:'TIMEOUT'}[tool_rc]
+
+    win_region_cpu, circuit_extr_cpu, circuit_size = parse_demiurge_logs(readfile(tool_log_file)) \
                                                      if is_realizable else (None, None, None)
 
-    return Run(None,
-               tool_launch_data.input_file,
-               run_stats.cpu_time_sec,
-               win_region_cpu,
-               circuit_extr_cpu,
-               circuit_size,
-               run_stats.virt_mem_mb,
-               is_realizable,
-               readfile(tool_launch_data.output_file) if is_realizable else None,
-               readfile(tool_launch_data.log_file) if os.path.exists(tool_launch_data.log_file) else None,
-               None,
-               None)
+    return RunResult(None,
+                     win_region_cpu,
+                     circuit_extr_cpu,
+                     circuit_size,
+                     None,
+                     is_realizable,
+                     readfile(tool_output_file) if is_realizable else None)
