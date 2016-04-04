@@ -11,9 +11,6 @@ from utils import execute_shell
 SPAWN_JOB_CMD = 'srun'
 
 
-# TODO: handle timeout
-
-
 def main(tool_cmd:str, tool_params:str,
          benchmarks_list:list,
          logs_dir:str,
