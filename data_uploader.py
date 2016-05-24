@@ -3,18 +3,18 @@ from structs import ExpDesc, TimedRunParams, ToolRunParams, RunResult
 from peewee import *
 
 from config import DB_HOST, DB_USER, DB_PASSWD, DB_DBNAME
+from utils import readfile
 
 
 # taken from:
 # http://peewee.readthedocs.org/en/latest/peewee/example.html#example-app
 
-# database = MySQLDatabase(host=DB_HOST,
-#                          user=DB_USER,
-#                          passwd=DB_PASSWD,
-#                          database=DB_DBNAME)
-from utils import readfile
+database = MySQLDatabase(host=DB_HOST,
+                         user=DB_USER,
+                         passwd=DB_PASSWD,
+                         database=DB_DBNAME)
 
-database = SqliteDatabase('tests.db')
+# database = SqliteDatabase('tests.db')
 
 
 class BaseModel(Model):  # BaseModel is only used to specify the database
