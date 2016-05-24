@@ -37,17 +37,14 @@ def extract_data(tool_output_file,
     logging.info('data_extractor.extract_data')
 
     assert tool_rc in (REAL_RC, UNREAL_RC, TIMEOUT_RC), tool_rc
-    is_realizable = {REAL_RC:'REAL',
-                     UNREAL_RC:'UNREAL',
-                     TIMEOUT_RC:'TIMEOUT'}[tool_rc]
 
     win_region_cpu, circuit_extr_cpu, circuit_size = parse_tool_logs(readfile(tool_log_file)) \
-                                                     if is_realizable else (None, None, None)
+                                                     if tool_rc == REAL_RC else (None, None, None)
 
     return RunResult(None,
                      win_region_cpu,
                      circuit_extr_cpu,
                      circuit_size,
                      None,
-                     is_realizable,
-                     readfile(tool_output_file) if is_realizable else None)
+                     {REAL_RC:'REAL', UNREAL_RC:'UNREAL', TIMEOUT_RC:'TIMEOUT'}[tool_rc],
+                     readfile(tool_output_file) if tool_rc == REAL_RC else None)
