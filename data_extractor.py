@@ -6,20 +6,20 @@ from structs import RunResult
 from utils import readfile
 
 
-def parse_demiurge_logs(tool_log) -> (float, float, int):
+def parse_tool_logs(tool_log) -> (float, float, int):
     """
     :returns: win_region_time_sec, circuit_extr_sec
     """
 
-    win_region_cpu = re.findall('Winning region computation time: ([0-9]+[\.]?[0-9]*) sec CPU time',
+    win_region_cpu = re.findall('calc_win_region took \(sec\): ([0-9]+)',
                                 tool_log)
     assert len(win_region_cpu) == 1, win_region_cpu
 
-    circuit_extr_cpu = re.findall('Relation determinization time: ([0-9]+[\.]?[0-9]*) sec CPU time',
+    circuit_extr_cpu = re.findall('extract_output_funcs took \(sec\): ([0-9]+)',
                                   tool_log)
     assert len(circuit_extr_cpu) == 1, circuit_extr_cpu
 
-    circuit_size = re.findall('Final circuit size: +([0-9]+)', tool_log)
+    circuit_size = re.findall('circuit size: ([0-9]+)', tool_log)
     # assert len(circuit_size) == 1, circuit_size   # demiurge prints this message twice for some reason
 
     return float(win_region_cpu[0]),\
@@ -41,7 +41,7 @@ def extract_data(tool_output_file,
                      UNREAL_RC:'UNREAL',
                      TIMEOUT_RC:'TIMEOUT'}[tool_rc]
 
-    win_region_cpu, circuit_extr_cpu, circuit_size = parse_demiurge_logs(readfile(tool_log_file)) \
+    win_region_cpu, circuit_extr_cpu, circuit_size = parse_tool_logs(readfile(tool_log_file)) \
                                                      if is_realizable else (None, None, None)
 
     return RunResult(None,
