@@ -4,6 +4,8 @@ import traceback
 import logging
 import datetime
 import timed_run
+from adhoc_fields import adhoc_fields
+from adhoc_fields_data_extractor import extract_adhoc_data
 
 from ansistrm import setup_logging
 from consts import REAL_RC, TIMEOUT_STR, TIMEOUT_RC, FAIL_STR
@@ -11,23 +13,28 @@ from consts import UNREAL_RC
 from data_extractor import extract_data
 from structs import ToolRunParams, ExpDesc, TimedRunParams, RunResult
 from data_uploader import upload_run
+from utils import readfile
 
 
 def main(exp:ExpDesc, timed_run_params:TimedRunParams, tool_run_params:ToolRunParams):
     run_stats, tool_rc = timed_run.main(timed_run_params, tool_run_params)
 
+    tool_log_str = readfile(tool_run_params.log_file)
+
     if tool_rc in (REAL_RC, UNREAL_RC):
-        run_result = extract_data(tool_run_params.output_file,
-                                  tool_run_params.log_file,
+        run_result = extract_data(readfile(tool_run_params.output_file) if tool_rc==REAL_RC else None,
+                                  tool_log_str,
                                   tool_rc)
     elif tool_rc == TIMEOUT_RC:
         run_result = RunResult(None, None, None, TIMEOUT_STR, None)
     else:
         run_result = RunResult(None, None, None, FAIL_STR, None)
 
+    adhoc_data = extract_adhoc_data(tool_log_str, adhoc_fields)
+
     run_result.total_time_sec = run_stats.wall_time_sec
     run_result.memory_mb = run_stats.virt_mem_mb
-    upload_run(exp, timed_run_params, tool_run_params, run_result)
+    upload_run(exp, timed_run_params, tool_run_params, run_result, adhoc_data)
 
 
 def set_exc_hook():

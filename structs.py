@@ -1,5 +1,10 @@
 import datetime
 
+"""
+These classes are more or less 'static' (supposed to fit any synthesis tool).
+For adding new stats to log -- use adhoc_fields.py
+"""
+
 
 class ExpDesc:
     def __init__(self,

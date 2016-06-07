@@ -34,7 +34,7 @@ def main(tool_cmd:str, tool_params:str,
         rc = os.system('{spawn_job} -p {hardware} python3 {REU} '
                        '--tool "{tool_cmd}" --tool_params "{tool_params}" '
                        '--input_file "{input_file}" '
-                       # '--output_file "{output_file}" '
+                       '--output_file "{output_file}" '
                        '--exec_log "{exec_log}" --tool_log "{tool_log}" '
                        '--exp_name "{exp_name}" --commit "{commit}" '
                        '--time_limit_sec {time_limit_sec} --memory_limit_mb {memory_limit_mb} '

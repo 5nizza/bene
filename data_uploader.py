@@ -1,4 +1,9 @@
 import logging
+
+from typing import Iterable
+
+from adhoc_fields import adhoc_fields
+from field_desc import FieldDesc
 from structs import ExpDesc, TimedRunParams, ToolRunParams, RunResult
 from peewee import *
 
@@ -22,7 +27,8 @@ class BaseModel(Model):  # BaseModel is only used to specify the database
         database = database
 
 
-class RunRecordMain(BaseModel):
+class RunRecord(BaseModel):
+    """ Note: see the end of this module -- this class is updated with fields from adhoc_fields """
     total_time_sec = FloatField(null=True)
     circuit_size = IntegerField(null=True)
     memory_mb = FloatField(null=True)
@@ -68,30 +74,46 @@ class RunRecordMain(BaseModel):
         self.memory_limit_mb = timed_run_params.memory_limit_mb
 
 
+def __add_static_fields_RunRecord(adhoc_fields_:Iterable[FieldDesc]):
+    for f_desc in adhoc_fields_:
+        f_desc.db_field.add_to_class(RunRecord, f_desc.name)
+
+
+def __add_object_fields_RunRecord(rr:RunRecord, adhoc_data:dict):
+    """ :arg adhoc_data: dict{field_name -> field python value}"""
+    for name, value in adhoc_data.items():
+        setattr(rr, name, value)
+
+
 def upload_run(exp_desc:ExpDesc,
                timed_run_params:TimedRunParams,
                tool_run_params:ToolRunParams,
-               run_result:RunResult):
+               run_result:RunResult,
+               adhoc_data:dict):
     logging.info('data_uploader.upload_record')
     logging.debug('run_result=' + str(run_result))
-    RunRecordMain._meta.db_table = exp_desc.exp_name
+    RunRecord._meta.db_table = exp_desc.exp_name
     with database.transaction():
-        rr = RunRecordMain(exp_desc, timed_run_params, tool_run_params, run_result)
+        rr = RunRecord(exp_desc, timed_run_params, tool_run_params, run_result)
+        __add_object_fields_RunRecord(rr, adhoc_data)
         rr.save()
 
 
 def create_table(table_name):
     """ Fails if table 'table_name' already exists. """
     logging.info('create_table: ' + table_name)
-    RunRecordMain._meta.db_table = table_name
+    RunRecord._meta.db_table = table_name   # TODO: not clear: should you restore the old name?
     database.connect()
-    database.create_table(RunRecordMain)
+    database.create_table(RunRecord)
     database.close()
 
 
 def table_exists(table_name):
-    old_name = RunRecordMain._meta.db_table
-    RunRecordMain._meta.db_table = table_name
-    result = RunRecordMain.table_exists()
-    RunRecordMain._meta.db_table = old_name
+    old_name = RunRecord._meta.db_table
+    RunRecord._meta.db_table = table_name
+    result = RunRecord.table_exists()
+    RunRecord._meta.db_table = old_name
     return result
+
+
+__add_static_fields_RunRecord(adhoc_fields)
