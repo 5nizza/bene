@@ -6,27 +6,6 @@ from structs import RunResult
 from utils import readfile
 
 
-def parse_tool_logs(tool_log) -> (float, float, int):
-    """
-    :returns: win_region_time_sec, circuit_extr_sec
-    """
-
-    win_region_cpu = re.findall('calc_win_region took \(sec\): ([0-9]+)',
-                                tool_log)
-    assert len(win_region_cpu) == 1, win_region_cpu
-
-    circuit_extr_cpu = re.findall('extract_output_funcs took \(sec\): ([0-9]+)',
-                                  tool_log)
-    assert len(circuit_extr_cpu) == 1, circuit_extr_cpu
-
-    circuit_size = re.findall('circuit size: ([0-9]+)', tool_log)
-    # assert len(circuit_size) == 1, circuit_size   # demiurge prints this message twice for some reason
-
-    return float(win_region_cpu[0]),\
-           float(circuit_extr_cpu[0]),\
-           int(circuit_size[0])
-
-
 def extract_data(tool_output_file,
                  tool_log_file,
                  tool_rc) -> RunResult:
@@ -36,15 +15,24 @@ def extract_data(tool_output_file,
     """
     logging.info('data_extractor.extract_data')
 
-    assert tool_rc in (REAL_RC, UNREAL_RC, TIMEOUT_RC), tool_rc
+    assert tool_rc in (REAL_RC, UNREAL_RC), tool_rc
 
-    win_region_cpu, circuit_extr_cpu, circuit_size = parse_tool_logs(readfile(tool_log_file)) \
-                                                     if tool_rc == REAL_RC else (None, None, None)
+    tool_log_str = readfile(tool_log_file)
 
     return RunResult(None,
-                     win_region_cpu,
-                     circuit_extr_cpu,
-                     circuit_size,
+                     int(re.findall('calc_win_region took \(sec\): ([0-9]+)', tool_log_str)[0]),
+                     int(re.findall('extract_output_funcs took \(sec\): ([0-9]+)', tool_log_str)[0])
+                         if tool_rc == REAL_RC else None,
+                     int(re.findall('circuit size: ([0-9]+)', tool_log_str)[0])
+                         if tool_rc == REAL_RC else None,
                      None,
-                     {REAL_RC:'REAL', UNREAL_RC:'UNREAL', TIMEOUT_RC:'TIMEOUT'}[tool_rc],
-                     readfile(tool_output_file) if tool_rc == REAL_RC else None)
+                     {REAL_RC:'REAL', UNREAL_RC:'UNREAL'}[tool_rc],
+                     readfile(tool_output_file) if tool_rc == REAL_RC and tool_output_file else None,
+                     int(re.findall('calc_trans_rel took \(sec\): ([0-9]+)', tool_log_str)[0]),
+                     # re.findall('order_after_trans_rel: (.+$)', tool_log_str, flags=re.M)[0],
+                     None,
+                     # re.findall('order_after_win_region: (.+$)', tool_log_str, flags=re.M)[0],
+                     None,
+                     None)
+                     # re.findall('order_after_circuit_extraction: (.+$)', tool_log_str, flags=re.M)[0]
+                     #     if tool_rc == REAL_RC else None)

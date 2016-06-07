@@ -21,9 +21,9 @@ def main(exp:ExpDesc, timed_run_params:TimedRunParams, tool_run_params:ToolRunPa
                                   tool_run_params.log_file,
                                   tool_rc)
     elif tool_rc == TIMEOUT_RC:
-        run_result = RunResult(None, None, None, None, None, TIMEOUT_STR, None)
+        run_result = RunResult(None, None, None, TIMEOUT_STR, None)
     else:
-        run_result = RunResult(None, None, None, None, None, FAIL_STR, None)
+        run_result = RunResult(None, None, None, FAIL_STR, None)
 
     run_result.total_time_sec = run_stats.wall_time_sec
     run_result.memory_mb = run_stats.virt_mem_mb
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     parser.add_argument('--tool',        required=True, help='your tool executable')
     parser.add_argument('--tool_params', required=False, help='parameters for your tool (excl. input and output files)')
     parser.add_argument('--input_file',  required=True, help='input file to the tool')
-    parser.add_argument('--output_file', required=True, help='output file for the tool')
+    parser.add_argument('--output_file', required=False, default=None, help='output file for the tool')
     parser.add_argument('--exec_log',    required=True, help='file name to store my execution logs')
     parser.add_argument('--tool_log',    required=True, help="file name to store your tool' logs")
     parser.add_argument('--exp_name',    required=True, help="name the experiment run")

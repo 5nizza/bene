@@ -6,7 +6,6 @@ import logging
 
 from ansistrm import setup_logging
 from data_uploader import create_table, table_exists
-from utils import execute_shell
 
 SPAWN_JOB_CMD = 'srun'
 
@@ -32,31 +31,30 @@ def main(tool_cmd:str, tool_params:str,
     for input_file in benchmarks_list:
         logging.info('starting a job for ' + input_file)
         input_basename = os.path.basename(input_file)
-        # rc, out, err = execute_shell('{spawn_job} '   # TODO: debug only
-        rc, out, err = execute_shell('python3 {REU} '
-                                     '--tool "{tool_cmd}" --tool_params "{tool_params}" '
-                                     '--input_file "{input_file}" --output_file "{output_file}" '
-                                     '--exec_log "{exec_log}" --tool_log "{tool_log}" '
-                                     '--exp_name "{exp_name}" --commit "{commit}" '
-                                     '--time_limit_sec {time_limit_sec} --memory_limit_mb {memory_limit_mb} '
-                                     '--hardware "{hardware}"'
-                                     .format(spawn_job=SPAWN_JOB_CMD,
-                                             REU='reu.py',
-                                             tool_cmd=tool_cmd,
-                                             tool_params=tool_params,
-                                             input_file=input_file,
-                                             output_file=logs_dir + '/' + input_basename + '.model',
-                                             exec_log=logs_dir + '/' + input_basename + '.exec.log',
-                                             tool_log=logs_dir + '/' + input_basename + '.tool.log',
-                                             exp_name=exp_name,
-                                             commit=commit,
-                                             time_limit_sec=time_limit_sec,
-                                             memory_limit_mb=memory_limit_mb,
-                                             hardware=hardware
-                                             ))
+        rc = os.system('{spawn_job} -p {hardware} python3 {REU} '
+                       '--tool "{tool_cmd}" --tool_params "{tool_params}" '
+                       '--input_file "{input_file}" '
+                       # '--output_file "{output_file}" '
+                       '--exec_log "{exec_log}" --tool_log "{tool_log}" '
+                       '--exp_name "{exp_name}" --commit "{commit}" '
+                       '--time_limit_sec {time_limit_sec} --memory_limit_mb {memory_limit_mb} '
+                       '--hardware "{hardware}" &'
+                       .format(spawn_job=SPAWN_JOB_CMD,
+                               REU='reu.py',
+                               tool_cmd=tool_cmd,
+                               tool_params=tool_params,
+                               input_file=input_file,
+                               output_file=logs_dir + '/' + input_basename + '.model.aag',
+                               exec_log=logs_dir + '/' + input_basename + '.exec.log',
+                               tool_log=logs_dir + '/' + input_basename + '.tool.log',
+                               exp_name=exp_name,
+                               commit=commit,
+                               time_limit_sec=time_limit_sec,
+                               memory_limit_mb=memory_limit_mb,
+                               hardware=hardware
+                               ))
         if rc != 0:
-            logging.fatal('run.py:main: FAILED (see below)')
-            logging.info('rc = ' + str(rc) + ', stdout = ' + out + ', stderr = ' + err)
+            logging.fatal('run.py:main: FAILED: rc = ' + str(rc))
             return 1
 
         # end of for

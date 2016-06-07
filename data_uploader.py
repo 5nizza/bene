@@ -22,10 +22,8 @@ class BaseModel(Model):  # BaseModel is only used to specify the database
         database = database
 
 
-class RunRecord(BaseModel):
+class RunRecordMain(BaseModel):
     total_time_sec = FloatField(null=True)
-    time_win_region_sec = FloatField(null=True)
-    time_extraction_sec = FloatField(null=True)
     circuit_size = IntegerField(null=True)
     memory_mb = FloatField(null=True)
     is_realizable = CharField()
@@ -51,8 +49,6 @@ class RunRecord(BaseModel):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.total_time_sec = run_result.total_time_sec
-        self.time_win_region_sec = run_result.time_win_region_sec
-        self.time_extraction_sec = run_result.time_circuit_sec
         self.circuit_size = run_result.circuit_size
         self.memory_mb = run_result.memory_mb
         self.is_realizable = run_result.is_realizable
@@ -78,24 +74,24 @@ def upload_run(exp_desc:ExpDesc,
                run_result:RunResult):
     logging.info('data_uploader.upload_record')
     logging.debug('run_result=' + str(run_result))
-    RunRecord._meta.db_table = exp_desc.exp_name
+    RunRecordMain._meta.db_table = exp_desc.exp_name
     with database.transaction():
-        rr = RunRecord(exp_desc, timed_run_params, tool_run_params, run_result)
+        rr = RunRecordMain(exp_desc, timed_run_params, tool_run_params, run_result)
         rr.save()
 
 
 def create_table(table_name):
     """ Fails if table 'table_name' already exists. """
     logging.info('create_table: ' + table_name)
-    RunRecord._meta.db_table = table_name
+    RunRecordMain._meta.db_table = table_name
     database.connect()
-    database.create_table(RunRecord)
+    database.create_table(RunRecordMain)
     database.close()
 
 
 def table_exists(table_name):
-    old_name = RunRecord._meta.db_table
-    RunRecord._meta.db_table = table_name
-    result = RunRecord.table_exists()
-    RunRecord._meta.db_table = old_name
+    old_name = RunRecordMain._meta.db_table
+    RunRecordMain._meta.db_table = table_name
+    result = RunRecordMain.table_exists()
+    RunRecordMain._meta.db_table = old_name
     return result
