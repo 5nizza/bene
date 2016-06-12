@@ -11,16 +11,29 @@ It expresses the often changing stats you want to log.
 
 
 adhoc_fields = (
-    FieldDesc('automata_translation_sec',
+    FieldDesc('real_atm_convert_sec',
               int,
               IntegerField(null=True),
-              re.compile('automata translation took \(sec\): ([0-9]+)')),
-    FieldDesc('parsing_building_expr',
+              re.compile('\(real\) automaton translation took \(sec\): ([0-9]+)')),
+    FieldDesc('real_atm_size',
               int,
               IntegerField(null=True),
-              re.compile('parsing and building expr took \(sec\): ([0-9]+)')),
-    FieldDesc('model_search_sec',
+              re.compile('\(real\) automaton size is: ([0-9]+)')),
+    FieldDesc('real_model_search_sec',
               int,
               IntegerField(null=True),
-              re.compile('model_searcher\.search took \(sec\): ([0-9]+)'))
+              re.compile('\(real\) model_searcher\.search took \(sec\): ([0-9]+)')),
+
+    FieldDesc('unreal_atm_convert_sec',
+              int,
+              IntegerField(null=True),
+              re.compile('\(unreal\) automaton translation took \(sec\): ([0-9]+)')),
+    FieldDesc('unreal_atm_size',
+              int,
+              IntegerField(null=True),
+              re.compile('\(unreal\) automaton size is: ([0-9]+)')),
+    FieldDesc('unreal_model_search_sec',
+              int,
+              IntegerField(null=True),
+              re.compile('\(unreal\) model_searcher\.search took \(sec\): ([0-9]+)'))
 )

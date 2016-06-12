@@ -52,9 +52,7 @@ if __name__ == "__main__":
     # TODO: bad design for tool params? (provide template?)
 
     parser = argparse.ArgumentParser(description='REU: Run the tool - Extract the data - Upload to the DB.\n'
-                                                 "Note on the DB: if a table named 'exp_name' already exists,\n"
-                                                 "then I create table 'exp_name_i' with lowest natural number i\n"
-                                                 "such that 'exp_name_i' is not in the DB.",
+                                                 "Care: existing tables of the same name may be xxx.",
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--tool',        required=True, help='your tool executable')
     parser.add_argument('--tool_params', required=False, help='parameters for your tool (excl. input and output files)')
